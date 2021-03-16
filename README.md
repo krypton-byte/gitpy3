@@ -5,7 +5,7 @@
 > python3
 ```
 ```python3
->>> from gitpy import owner, SearchRepos
+>>> from gitpy3 import owner, SearchRepos
 >>> owner("krypton-byte")
 <[ username: krypton-byte ]>
 >>> owner("krypton-byte).get_gists()

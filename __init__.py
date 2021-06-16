@@ -33,10 +33,12 @@ class file_gist:
         self.type     = self.js["type"]
         self.language = self.js["language"]
         self.size     = self.js["size"]
-    def get_raw(self):
+    @property
+    def raw(self):
         return get(self.js["raw_url"], headers=headers, proxies=proxy).content
+    @property
     def download(self):
-        return download(self.js["raw"])
+        return download(self.js["raw_url"])
     def __repr__(self) -> str:
         return f"<[ Filename: {self.js['filename']}   Size: {self.js['size']}  ]>"
 class gists:
@@ -44,10 +46,12 @@ class gists:
         self.js    = js
         self.files = [file_gist(self.js["files"][url]) for url in self.js["files"].keys()]
         self.url   = self.js["url"]
+    @property
     def owner(self):
         return owner(self.js["owner"]["login"])
-    def get_commits(self):
-        return [gists(comuser["url"]) for comuser in get(self.url+"/commits", headers=headers, proxies=proxy).json()]
+    @property
+    def commits(self):
+        return [gists(get(comuser["url"], headers=headers, proxies=proxy).json()) for comuser in get(self.url+"/commits", headers=headers, proxies=proxy).json()]
     def __repr__(self) -> str:
         return f"<[ Gist: {len(self.js['files'].keys())} Files ]>"
 class repo_object:
@@ -63,10 +67,13 @@ class repo_object:
         self.watcher   = self.js["watchers_count"]
     def readme(self, filename=False):
         return readme(f"https://github.com/{self.full_name}", filename)
+    @property
     def owner(self):
         return owner(self.js["owner"]["login"])
+    @property
     def download(self):
         return download(f"https://github.com/{self.full_name}/archive/{self.branch}.zip")
+    @property
     def fork(self):
         return [repo_object(i) for i in [x for x in get(f"https://api.github.com/repos/{self.full_name}/forks", headers=headers,proxies=proxy).json()]]
     def __repr__(self):
@@ -99,15 +106,21 @@ class owner:
 
     def __repr__(self):
         return f"<[ username: {self.username} ]>"
-    def get_subcriptions(self):
+    @property
+    def subcriptions(self):
         return [repo_object(repo) for repo in get(f"https://api.github.com/users/{self.username}/subscriptions", proxies=proxy, headers=headers).json()]
+    @property
     def owner(self):
         return owner(self.username)
-    def get_repos(self):
+    @property
+    def repository(self):
         return [repo_object(i, is_owner=True) for i in get(f"https://api.github.com/users/{self.username}/repos", headers=headers, proxies=proxy).json() ]
-    def get_followers(self):
+    @property
+    def followers(self):
         return [owner(js=user) for user in get(f"https://api.github.com/users/{self.username}/followers", headers=headers, proxies=proxy).json()]
-    def get_following(self):
+    @property
+    def following(self):
         return [owner(js=user) for user in get(f"https://api.github.com/users/{self.username}/following", headers=headers, proxies=proxy).json()]
-    def get_gists(self):
+    @property
+    def gists(self):
         return [gists(gist_) for gist_ in get(f"https://api.github.com/users/{self.username}/gists", headers=headers, proxies=proxy).json()]

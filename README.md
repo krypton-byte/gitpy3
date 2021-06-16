@@ -8,7 +8,7 @@
 >>> from gitpy3 import owner, SearchRepos
 >>> owner("krypton-byte")
 <[ username: krypton-byte ]>
->>> owner("krypton-byte).get_gists()
+>>> owner("krypton-byte).gists
 [<[ Gist: 1 Files ]>]
 >>> SearchRepos("gitpy")
 <[ Total: 2]>
